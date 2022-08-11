@@ -51,23 +51,21 @@ RUN set -eux; \
   docker-php-ext-configure imap --with-imap --with-imap-ssl; \
   docker-php-ext-configure gd --with-freetype --with-webp --with-jpeg; \
 	docker-php-ext-install -j$(nproc) \
-		pdo \
 		pdo_pgsql \
     pdo_mysql \
 		intl \
 		zip \
-    xml \
     soap \
     ldap \
     gd \
     gmp \
-    sodium \
     xsl \
     tidy \
     pcntl \
     imap \
     sockets \
     bcmath \
+    mbstring \
 	; \
 	pecl install \
 		apcu \

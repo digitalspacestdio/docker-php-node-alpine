@@ -15,14 +15,13 @@ for PHP_VERSION in $PHP_VERSIONS; do
         node_minor=$(echo $exact_node_version | awk -F. '{print $2}')
         node_fix=$(echo $exact_node_version | awk -F. '{print $3}')
         
-        echo "
         docker --log-level error buildx build --push --platform linux/amd64,linux/arm64 $DOCKER_BUILD_PHP_ARGS \
         --build-arg PHP_VERSION=$PHP_VERSION \
         --build-arg NODE_VERSION=$exact_node_version \
         -t $REPOSITORY/php-node-alpine:$php_major.$php_minor.$php_fix-$node_major.$node_minor.$node_fix \
         -t $REPOSITORY/php-node-alpine:$php_major.$php_minor-$node_major.$node_minor \
         -t $REPOSITORY/php-node-alpine:$php_major.$php_minor-$node_major
-        "
+
     done
     docker --log-level error rmi -f php:${PHP_VERSION}-fpm-alpine
 done
