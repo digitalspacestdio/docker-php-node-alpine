@@ -20,7 +20,8 @@ for PHP_VERSION in $PHP_VERSIONS; do
         --build-arg NODE_VERSION=$exact_node_version \
         -t $REPOSITORY/php-node-alpine:$php_major.$php_minor.$php_fix-$node_major.$node_minor.$node_fix \
         -t $REPOSITORY/php-node-alpine:$php_major.$php_minor-$node_major.$node_minor \
-        -t $REPOSITORY/php-node-alpine:$php_major.$php_minor-$node_major
+        -t $REPOSITORY/php-node-alpine:$php_major.$php_minor-$node_major \
+        .
 
     done
     docker --log-level error rmi -f php:${PHP_VERSION}-fpm-alpine
