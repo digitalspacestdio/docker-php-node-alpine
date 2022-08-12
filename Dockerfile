@@ -12,11 +12,11 @@ ARG PHP_USER_GROUP=developer
 
 # persistent / runtime deps
 RUN apk add --no-cache \
-		acl \
-		fcgi \
-		file \
-		gettext \
-		git \
+    acl \
+    fcgi \
+    file \
+    gettext \
+    git \
     bash \
     curl \
     msmtp-openrc \
@@ -24,37 +24,37 @@ RUN apk add --no-cache \
     pngquant \
     optipng \
     gifsicle \
-	;
+  ;
 
 RUN set -eux; \
-	apk add --no-cache --virtual .build-deps \
-		$PHPIZE_DEPS \
-		icu-data-full \
-		icu-dev \
-		libzip-dev \
-		zlib-dev \
+  apk add --no-cache --virtual .build-deps \
+    $PHPIZE_DEPS \
+    icu-data-full \
+    icu-dev \
+    libzip-dev \
+    zlib-dev \
     libxml2-dev \
     libxslt-dev \
-		postgresql-dev \
+    postgresql-dev \
     openldap-dev \
     freetype-dev \
     libjpeg-turbo-dev \
-		libpng-dev \
+    libpng-dev \
     libwebp-dev \
     gmp-dev \
     tidyhtml-dev \
     imap-dev \
     oniguruma-dev \
-	; \
-	\
+  ; \
+  \
   docker-php-ext-configure zip; \
   docker-php-ext-configure imap --with-imap --with-imap-ssl; \
   docker-php-ext-configure gd --with-freetype --with-webp --with-jpeg; \
-	docker-php-ext-install -j$(nproc) \
-		pdo_pgsql \
+  docker-php-ext-install -j$(nproc) \
+    pdo_pgsql \
     pdo_mysql \
-		intl \
-		zip \
+    intl \
+    zip \
     soap \
     ldap \
     gd \
@@ -66,30 +66,30 @@ RUN set -eux; \
     sockets \
     bcmath \
     mbstring \
-	; \
-	pecl install \
-		apcu \
+  ; \
+  pecl install \
+    apcu \
     igbinary \
     mongodb \
     redis \
-	; \
-	pecl clear-cache; \
-	docker-php-ext-enable \
-		apcu \
-		opcache \
+  ; \
+  pecl clear-cache; \
+  docker-php-ext-enable \
+    apcu \
+    opcache \
     mongodb \
     redis \
-	; \
-	\
-	runDeps="$( \
-		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
-			| tr ',' '\n' \
-			| sort -u \
-			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-	)"; \
-	apk add --no-cache --virtual .app-phpexts-rundeps $runDeps; \
-	\
-	apk del .build-deps
+  ; \
+  \
+  runDeps="$( \
+    scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
+      | tr ',' '\n' \
+      | sort -u \
+      | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+  )"; \
+  apk add --no-cache --virtual .app-phpexts-rundeps $runDeps; \
+  \
+  apk del .build-deps
 
 RUN addgroup -g $PHP_GID ${PHP_USER_GROUP} \
     && adduser -u $PHP_UID -G ${PHP_USER_GROUP} -s /bin/sh -D ${PHP_USER_NAME} \
@@ -217,16 +217,16 @@ FROM app_php AS app_php_dev
 ENV APP_ENV=dev XDEBUG_MODE=off
 
 RUN rm $PHP_INI_DIR/conf.d/app.prod.ini; \
-	mv "$PHP_INI_DIR/php.ini" "$PHP_INI_DIR/php.ini-production"; \
-	mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+  mv "$PHP_INI_DIR/php.ini" "$PHP_INI_DIR/php.ini-production"; \
+  mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 COPY app.dev.ini $PHP_INI_DIR/conf.d/
 
 RUN set -eux; \
-	apk add --no-cache --virtual .build-deps $PHPIZE_DEPS; \
-	pecl install xdebug; \
-	docker-php-ext-enable xdebug; \
-	apk del .build-deps
+  apk add --no-cache --virtual .build-deps $PHPIZE_DEPS; \
+  pecl install xdebug; \
+  docker-php-ext-enable xdebug; \
+  apk del .build-deps
 
 USER ${PHP_USER_NAME}
 VOLUME "/home/php" "/root" '/var/www'
