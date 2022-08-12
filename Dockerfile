@@ -60,28 +60,28 @@ RUN set -eux; \
   \
   mkdir -p /usr/src/php/ext/apcu; \
   curl -fsSL https://github.com/krakjoe/apcu/archive/v$EXT_APCU_VERSION.tar.gz | tar xvz -C /usr/src/php/ext/apcu --strip 1; \
-  docker-php-ext-install -j$(printf "1\n$(nproc)" | sort -g | head -n1) apcu; \
+  docker-php-ext-install -j$(printf "2\n$(nproc)" | sort -g | head -n1) apcu; \
   \
   mkdir -p /usr/src/php/ext/igbinary; \
   curl -fsSL curl -fsSL https://github.com/igbinary/igbinary/archive/$EXT_IGBINARY_VERSION.tar.gz | tar xvz -C /usr/src/php/ext/igbinary --strip 1; \
-  docker-php-ext-install -j$(printf "1\n$(nproc)" | sort -g | head -n1) igbinary; \
+  docker-php-ext-install -j$(printf "2\n$(nproc)" | sort -g | head -n1) igbinary; \
   \
   mkdir -p /usr/src/php/ext/redis; \
   curl -fsSL curl -fsSL https://github.com/phpredis/phpredis/archive/$EXT_REDIS_VERSION.tar.gz | tar xvz -C /usr/src/php/ext/redis --strip 1; \
   docker-php-ext-configure redis --enable-redis-igbinary; \
-  docker-php-ext-install -j$(printf "1\n$(nproc)" | sort -g | head -n1) redis; \
+  docker-php-ext-install -j$(printf "2\n$(nproc)" | sort -g | head -n1) redis; \
   \
   mkdir -p /usr/src/php/ext/mongodb; \
   git clone --recursive --branch $EXT_MONGODB_VERSION --depth 1 https://github.com/mongodb/mongo-php-driver.git /usr/src/php/ext/mongodb; \
   docker-php-ext-configure mongodb; \
-  docker-php-ext-install -j$(printf "1\n$(nproc)" | sort -g | head -n1) mongodb; \
+  docker-php-ext-install -j$(printf "2\n$(nproc)" | sort -g | head -n1) mongodb; \
   \
   mkdir -p /usr/src/php/ext/xdebug; \
   curl -fsSL curl -fsSL https://github.com/xdebug/xdebug/archive/refs/tags/$EXT_XDEBUG_VERSION.tar.gz | tar xvz -C /usr/src/php/ext/xdebug --strip 1; \
   docker-php-ext-configure xdebug; \
-  docker-php-ext-install -j$(printf "1\n$(nproc)" | sort -g | head -n1) xdebug; \
+  docker-php-ext-install -j$(printf "2\n$(nproc)" | sort -g | head -n1) xdebug; \
   \
-  docker-php-ext-install -j$(printf "1\n$(nproc)" | sort -g | head -n1) \
+  docker-php-ext-install -j$(printf "2\n$(nproc)" | sort -g | head -n1) \
     pdo_pgsql \
     pdo_mysql \
     intl \
@@ -170,7 +170,7 @@ RUN addgroup -g $PHP_GID ${PHP_USER_GROUP} \
     && tar -xf "node-v$NODE_VERSION.tar.xz" \
     && cd "node-v$NODE_VERSION" \
     && ./configure \
-    && make -j$(printf "1\n$(nproc)" | sort -g | head -n1) V= \
+    && make -j$(printf "2\n$(nproc)" | sort -g | head -n1) V= \
     && make install \
     && apk del .build-deps-full \
     && cd .. \
