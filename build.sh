@@ -26,7 +26,5 @@ for PHP_VERSION in $PHP_VERSIONS; do
         -t $REPOSITORY/php-node-alpine:$php_major.$php_minor-$node_major.$node_minor \
         -t $REPOSITORY/php-node-alpine:$php_major.$php_minor-$node_major \
         .
-
     done
-    docker --log-level error rmi -f php:${PHP_VERSION}-fpm-alpine
 done
