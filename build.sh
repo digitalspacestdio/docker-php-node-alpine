@@ -1,8 +1,8 @@
 #set -x
 pushd `dirname $0` > /dev/null;DIR=`pwd -P`;popd > /dev/null
 REPOSITORY=${1-digitalspacestudio}
-PHP_VERSIONS="7.2 7.3 7.4 8.0 8.1 8.2"
-NODE_VERSIONS="12 14 16 18"
+PHP_VERSIONS="7.4 8.0 8.1 8.2"
+NODE_VERSIONS="14 16 18"
 ALL_NODE_VERSIONS=$(curl https://unofficial-builds.nodejs.org/download/release/ | pup 'a text{}' | grep -o '[0-9]\+.[0-9]\+.[0-9]\+' | sort --version-sort -r);
 for PHP_VERSION in $PHP_VERSIONS; do
     exact_php_version=$(docker --log-level error run --rm  php:${PHP_VERSION}-fpm-alpine sh -c "php --version | grep -o '^PHP [0-9]\+\.[0-9]\+\.[0-9A-Za-z]\+' | grep -o '[0-9]\+\.[0-9]\+\.[0-9A-Za-z]\+'")
