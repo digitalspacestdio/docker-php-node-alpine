@@ -1,3 +1,5 @@
+#!/bin/bash
+set -e
 #set -x
 pushd `dirname $0` > /dev/null;DIR=`pwd -P`;popd > /dev/null
 REPOSITORY=${1-digitalspacestudio}
