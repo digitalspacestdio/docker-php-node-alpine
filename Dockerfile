@@ -37,6 +37,13 @@ RUN apk add --no-cache \
     libstdc++ \
   ;
 
+# Copy nodejs binaries
+COPY --from=app_node /usr/local /usr/local
+COPY --from=app_node /opt /opt
+
+ # smoke test
+RUN node --version && npm --version && yarn --version
+
 RUN set -eux; \
   apk add --no-cache --virtual .build-deps \
     $PHPIZE_DEPS \
@@ -121,15 +128,6 @@ RUN addgroup -g $PHP_GID ${PHP_USER_GROUP} \
     && rm -rf /var/www/*  \
     && chown ${PHP_USER_NAME}:${PHP_USER_GROUP} /var/www
 
-# Copy nodejs binaries
-COPY --from=app_node /usr/local /usr/local
-COPY --from=app_node /opt /opt
-
- # smoke test
-RUN node --version && npm --version && yarn --version
-
-WORKDIR /var/www
-
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 COPY app.ini $PHP_INI_DIR/conf.d/
@@ -137,22 +135,13 @@ COPY php-fpm.conf /usr/local/etc/php-fpm.conf
 
 RUN mkdir -p /var/run/php
 
+COPY docker-healthcheck.sh /usr/local/bin/docker-healthcheck
+RUN chmod +x /usr/local/bin/docker-healthcheck
+
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
 ENTRYPOINT ["docker-entrypoint"]
-
-# https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
-ENV COMPOSER_ALLOW_SUPERUSER=1
-ENV PATH="${PATH}:/root/.composer/vendor/bin"
-
-# Install composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# Install ofelia
-COPY --from=mcuadros/ofelia:latest /usr/bin/ofelia /usr/bin/ofelia
-
-ENV APP_ENV=dev XDEBUG_MODE=off
 
 RUN rm -f $PHP_INI_DIR/conf.d/app.prod.ini; \
   mv "$PHP_INI_DIR/php.ini" "$PHP_INI_DIR/php.ini-production"; \
@@ -160,12 +149,16 @@ RUN rm -f $PHP_INI_DIR/conf.d/app.prod.ini; \
 
 COPY app.dev.ini $PHP_INI_DIR/conf.d/
 
-# RUN set -eux; \
-#   apk add --no-cache --virtual .build-deps $PHPIZE_DEPS; \
-#   pecl install xdebug; \
-#   docker-php-ext-enable xdebug; \
-#   apk del .build-deps
+# Install composer
+# https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV PATH="${PATH}:/root/.composer/vendor/bin"
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# Install ofelia
+COPY --from=mcuadros/ofelia:latest /usr/bin/ofelia /usr/bin/ofelia
+
+WORKDIR /var/www
 USER ${PHP_USER_NAME}
 VOLUME "/home/php" "/root" '/var/www'
 CMD [ "bash" ]
